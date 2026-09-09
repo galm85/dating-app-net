@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RegisterCreds } from '../../../types/user';
+import { RegisterCreds, User } from '../../../types/user';
+import { AccountService } from '../../../core/services/account-service';
 
 @Component({
   selector: 'app-register',
@@ -10,13 +11,21 @@ import { RegisterCreds } from '../../../types/user';
 })
 export class Register {
 
+  private accountService = inject(AccountService);
   protected creds = {} as RegisterCreds;
+  cancelRegister = output<boolean>();
 
   register(){
-    console.log(this.creds);
+    this.accountService.register(this.creds).subscribe({
+      next: response => {
+        console.log('register.ts - register(): ',response);
+        this.cancel()
+      },
+      error: error => console.log(error)
+    })
   }
 
   cancel(){
-    console.log('cancel');
+    this.cancelRegister.emit(false);
   }
 }
